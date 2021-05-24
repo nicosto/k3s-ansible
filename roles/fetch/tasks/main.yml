@@ -1,0 +1,29 @@
+---
+- name: create directory
+  become: true
+  ansible.builtin.file:
+    path: "{{ playbook_dir }}/fetched/{{ k3s_version }}"
+    state: directory
+    owner: "{{ fetch_user }}"
+    group: "{{ fetch_group }}"
+  register: fetch_dir
+
+- name: k3s binaries
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ k3s_url }}/k3s"
+    checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
+    dest: "{{ fetch_dir.path }}/k3s"
+    owner: "{{ fetch_user }}"
+    group: "{{ fetch_group }}"
+    mode: 0755
+ 
+- name: k3s container images
+  become: true
+  ansible.builtin.get_url:
+    url: "{{ k3s_url }}/k3s-airgap-images-amd64.tar"
+    checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
+    dest: "{{ fetch_dir.path }}/k3s-airgap-images-amd64.tar"
+    owner: "{{ fetch_user }}"
+    group: "{{ fetch_group }}"
+    mode: 0644
