@@ -1,0 +1,12 @@
+---
+- name: Add route 192.168.0.0/16
+  ansible.builtin.command: ip route add 192.168.0.0/16 via 192.168.50.1
+  ignore_errors: yes
+
+- name: delete default route
+  ansible.builtin.command: ip route delete default via 192.168.50.1
+  ignore_errors: yes
+
+- name: add fake default route
+  ansible.builtin.command: ip route add default via 192.168.50.254
+  ignore_errors: yes

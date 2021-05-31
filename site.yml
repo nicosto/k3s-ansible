@@ -4,16 +4,52 @@
   gather_facts: yes
   become: yes
   roles:
+    - role: airgap
     - role: prereq
     - role: download
     - role: raspberrypi
+  vars:
+    airgap_install: true
+  tags:
+    - prep
 
 - hosts: master
   become: yes
   roles:
+    - role: airgap
     - role: k3s/master
+  vars:
+    INSTALL_K3S_SKIP_DOWNLOAD: "{{ airgap_install }}"
+  tags:
+    - cluster
+    - master
 
 - hosts: node
   become: yes
   roles:
+    - role: airgap
     - role: k3s/node
+  vars:
+    INSTALL_K3S_SKIP_DOWNLOAD: "{{ airgap_install }}"
+  tags:
+    - cluster
+    - worker
+
+- hosts: master
+  become: yes
+  roles:
+    - role: airgap
+    - role: kube
+  tags:
+    - deploy
+    - kube
+
+- hosts: localhost
+  become: yes
+  gather_facts: false
+  roles:
+    - role: deploy
+  environment:
+    K8S_AUTH_KUBECONFIG: "{{ kubeconfig }}"
+  tags:
+    - deploy

@@ -6,7 +6,21 @@ master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['m
 extra_server_args: ""
 extra_agent_args: ""
 
-airgap_install: false
+kubeconfig: "{{ playbook_dir }}/.kubeconfig"
 k3s_url: "https://github.com/k3s-io/k3s/releases/download/{{ k3s_version }}"
 fetch_user: nicolas
 fetch_group: nicolas
+longhorn_version: 1.1.1
+airgap_install: false
+
+
+INSTALL_K3S_SKIP_DOWNLOAD: "{{ airgap_install }}"
+
+# https://raw.githubusercontent.com/longhorn/longhorn/v1.1.1/deploy/longhorn-images.txt
+
+
+container_images_list:
+  - name: longhornio/longhorn-manager
+    tag: "v{{ longhorn_version }}"
+  - name: longhornio/longhorn-ui
+    tag:  "v{{ longhorn_version }}"

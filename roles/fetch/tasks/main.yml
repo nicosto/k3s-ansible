@@ -1,29 +1,72 @@
 ---
-- name: create directory
-  become: true
-  ansible.builtin.file:
-    path: "{{ playbook_dir }}/fetched/{{ k3s_version }}"
-    state: directory
-    owner: "{{ fetch_user }}"
-    group: "{{ fetch_group }}"
-  register: fetch_dir
+# - name: create directory
+#   become: true
+#   ansible.builtin.file:
+#     path: "{{ playbook_dir }}/{{ item }}"
+#     state: directory
+#     owner: "{{ fetch_user }}"
+#     group: "{{ fetch_group }}"
+#   with_items:
+#     - fetched
+#     - "fetched/{{ k3s_version }}"
+#     - fetched/helmcharts
+#     - fetched/container_images
 
-- name: k3s binaries
-  become: true
-  ansible.builtin.get_url:
-    url: "{{ k3s_url }}/k3s"
-    checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
-    dest: "{{ fetch_dir.path }}/k3s"
-    owner: "{{ fetch_user }}"
-    group: "{{ fetch_group }}"
-    mode: 0755
+# - name: k3s {{ k3s_version }} binaries
+#   become: true
+#   ansible.builtin.get_url:
+#     url: "{{ k3s_url }}/k3s"
+#     checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
+#     dest: "{{ playbook_dir }}/fetched/{{ k3s_version }}/k3s"
+#     owner: "{{ fetch_user }}"
+#     group: "{{ fetch_group }}"
+#     mode: 0755
  
-- name: k3s container images
-  become: true
+# - name: k3s {{ k3s_version }} container images
+#   become: true
+#   ansible.builtin.get_url:
+#     url: "{{ k3s_url }}/k3s-airgap-images-amd64.tar"
+#     checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
+#     dest: "{{ playbook_dir }}/fetched/{{ k3s_version }}/k3s-airgap-images-amd64.tar"
+#     owner: "{{ fetch_user }}"
+#     group: "{{ fetch_group }}"
+#     mode: 0644
+
+# - name: longhorn {{ longhorn_version }} helmchart
+#   become: true
+#   ansible.builtin.get_url:
+#     url: "https://github.com/longhorn/charts/releases/download/longhorn-{{ longhorn_version }}/longhorn-{{ longhorn_version }}.tgz"
+#     dest: "{{ playbook_dir }}/fetched/helmcharts/longhorn-{{ longhorn_version }}.tgz"
+#     owner: "{{ fetch_user }}"
+#     group: "{{ fetch_group }}"
+#     mode: 0644
+
+# - name: container images
+#   community.docker.docker_image:
+#     name: "{{ item.name }}"
+#     tag: "{{ item.tag }}" 
+#     source: pull
+#     archive_path: "{{ playbook_dir }}/fetched/container_images/{{ item.name | basename }}_{{ item.tag }}.tar"
+#   with_items:
+#     "{{ container_images_list }}"
+
+
+- name:
   ansible.builtin.get_url:
-    url: "{{ k3s_url }}/k3s-airgap-images-amd64.tar"
-    checksum: "sha256:{{ k3s_url }}/sha256sum-amd64.txt"
-    dest: "{{ fetch_dir.path }}/k3s-airgap-images-amd64.tar"
+    url: "https://raw.githubusercontent.com/longhorn/longhorn/v{{ longhorn_version }}/deploy/longhorn-images.txt"
+    dest: "/tmp/longhorn-images.txt"
     owner: "{{ fetch_user }}"
     group: "{{ fetch_group }}"
     mode: 0644
+
+- debug:
+    msg: "{{item}}"
+  loop: "{{ lookup('file', '/tmp/longhorn-images.txt').splitlines() }}"
+
+- name: container images
+  community.docker.docker_image:
+    name: "{{ item }}"
+    # tag: "{{ item.tag }}" 
+    source: pull
+    archive_path: "{{ playbook_dir }}/fetched/container_images/{{ item| basename }}.tar"
+  loop: "{{ lookup('file', '/tmp/longhorn-images.txt').splitlines() }}"

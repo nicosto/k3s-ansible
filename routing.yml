@@ -1,0 +1,13 @@
+- hosts: k3s_cluster
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Return motd to registered var
+      ansible.builtin.command: ip route add 192.168.0.0/16 via 192.168.50.1
+
+    - name: Return motd to registered var
+      ansible.builtin.command: ip route delete default
+  vars:
+    airgap_install: true
+
+

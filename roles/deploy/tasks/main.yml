@@ -1,0 +1,19 @@
+---
+# - name: Wait for the cluser to be ready
+#   ansible.builtin.wait_for:
+#     host: 192.168.50.13
+#     port: 6443
+#     state: started 
+#     timeout: 1
+#     delay: 10
+#     sleep: 5
+#   retries: 3
+
+- name: Helm - longhorn
+  community.kubernetes.helm:
+    name: longhorn
+    chart_ref: "{{ playbook_dir }}/fetched/helmcharts/longhorn-{{ longhorn_version }}.tgz"
+    release_namespace: longhorn-system
+    create_namespace: true
+    values_files:
+      - "{{ playbook_dir }}/longhorn_values.yaml"

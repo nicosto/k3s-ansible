@@ -1,0 +1,16 @@
+# image:
+#   longhorn:
+#     engine: docker.io/longhorn-engine
+#     engineTag: <LONGHORN_ENGINE_IMAGE_TAG>
+#     manager: docker.io/longhorn-manager
+#     managerTag: LONGHORN_MANAGER_IMAGE_TAG<>
+#     ui: docker.io/longhorn-ui
+#     uiTag: <LONGHORN_UI_IMAGE_TAG>
+#     instanceManager: docker.io/longhorn-instance-manager
+#     instanceManagerTag: <LONGHORN_INSTANCE_MANAGER_IMAGE_TAG>
+
+# csi:
+#   attacherImage: docker.io/csi-attacher:<CSI_ATTACHER_IMAGE_TAG>
+#   provisionerImage: docker.io/csi-provisioner:<CSI_PROVISIONER_IMAGE_TAG>
+#   driverRegistrarImage: docker.io/csi-node-driver-registrar:<CSI_NODE_DRIVER_REGISTRAR_IMAGE_TAG>
+#   resizerImage: docker.io/csi-resizer:<CSI_RESIZER_IMAGE_TAG>

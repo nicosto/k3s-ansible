@@ -1,5 +1,5 @@
 ---
-- name: Deploy k3s binary x64
+- name: Deploy k3s {{ k3s_version }} binary for arch x64
   become: true
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/fetched/{{ k3s_version }}/k3s"
@@ -7,10 +7,10 @@
     owner: root
     group: root
     mode: 0755
-    when: ansible_facts.architecture == "x86_64"
+  when: ansible_facts.architecture == "x86_64"
 
 
-- name: create images drop directory
+- name: Create k3s container images drop directory
   become: true
   ansible.builtin.file:
     path: "/var/lib/rancher/k3s/agent/images/"
@@ -20,16 +20,27 @@
     mode: 0755
   register: images_drop_dir
 
-
-- name: Deploy k3s binary x64
+- name: Deploy k3s {{ k3s_version }} container images for arch x64
   become: true
   ansible.builtin.copy:
     src: "{{ playbook_dir }}/fetched/{{ k3s_version }}/k3s-airgap-images-amd64.tar"
     dest: "{{ images_drop_dir.path }}"
     owner: root
     group: root
-    mode: 0755
-    when: ansible_facts.architecture == "x86_64"
+    mode: 0644
+  when: ansible_facts.architecture == "x86_64"
+
+- name: Deploy extra container images for arch x64
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ images_drop_dir.path }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_fileglob:
+    - "{{ playbook_dir }}/fetched/container_images/*.tar"
+  when: ansible_facts.architecture == "x86_64"
 
 # - name: Download k3s binary arm64
 #   get_url:

@@ -21,6 +21,14 @@ on processor architecture:
 Deployment environment must have Ansible 2.4.0+
 Master and nodes must have passwordless SSH access
 
+## Ansible requirements
+
+Install the kubernetes 
+
+```bash
+ansible-galaxy collection install -r requirements.yml 
+```
+
 ## Usage
 
 First create a new directory based on the `sample` directory within the `inventory` directory:
